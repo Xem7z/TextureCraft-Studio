@@ -34,7 +34,7 @@
 ## 💻 System Requirements
 
 - Windows 10 or 11 (64-bit)
--#⚠️ Might work on Windows 7/8 64-bit, but not guaranteed
+  ⚠️ Might work on Windows 7/8 64-bit, but not guaranteed
 - At least 1 GB RAM
 
 ---
