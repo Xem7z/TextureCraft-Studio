@@ -21,6 +21,19 @@
 
 ---
 
+## 📥 How to Download
+
+You can always get the latest version of TextureCraft Studio from the **Releases** section.
+
+### 🔽 Steps to Download:
+
+1. Click the **["Releases"](https://github.com/Xem7z/TextureCraft-Studio/releases/tag/v1.0-Beta)** tab near the top of this GitHub page.
+2. Look for the latest version (example: `Beta v1.0.0`).
+3. Scroll down to the **Assets** section.
+4. Click on the `.exe` file (e.g., `TextureCraft-Studio.exe`) to download it.
+
+---
+
 ## 🚀 How to Use
 
 1. Open `TextureCraft Studio.exe`
