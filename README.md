@@ -1,4 +1,4 @@
-# 🎨 TextureCraft Studio (Windows EXE)
+# 🎨 TextureCraft Studio - Beta (Windows EXE)
 
 **TextureCraft Studio** is a standalone Windows application for creating and managing Minecraft Bedrock Edition texture packs. No coding or setup required — just download the `.exe` and start building!
 
@@ -33,12 +33,33 @@
 
 ## 💻 System Requirements
 
-- Windows 10 or 11 (64-bit)
-  ⚠️ Might work on Windows 7/8 64-bit, but not guaranteed
-- At least 1 GB RAM
+- ✅ Windows 10 or 11 (64-bit)
+- ⚠️ May work on Windows 7/8 (64-bit), not officially supported
+- ❌ Not compatible with Windows Vista or any 32-bit OS
 
 ---
 
 ## 📂 File Locations
 
 Projects and exports are saved in:
+C:\Users\YourName\TextureCraft Studio\
+
+---
+
+## 📣 Join the Community
+
+Got questions, bugs or suggestions?  
+Join the official TextureCraft Studio Discord:
+
+👉 **[TextureCraft Discord](https://discord.gg/XN9uPbQ3Bm)**
+
+---
+
+## ❗ License & Permissions
+
+> ❌ **Do NOT** redistribute, decompile, edit, or reupload TextureCraft Studio.  
+> ❌ Modifying or reselling this application is **strictly prohibited** under our community rules.  
+> ✅ You may use it freely for personal texture pack creation.
+
+All rights reserved © Xem7z & TextureCraft Team  
+Please respect the work and report misuse in our Discord server.
