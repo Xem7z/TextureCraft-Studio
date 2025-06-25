@@ -1,4 +1,4 @@
-# 🎨 TextureCraft Studio (Windows EXE)
+# 🎨 TextureCraft Studio v2.0.0
 
 **TextureCraft Studio** is a Windows application for creating and managing Minecraft Bedrock Edition texture packs. No coding or setup required — just download the `.exe` and start building!
 
