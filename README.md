@@ -14,8 +14,7 @@
 - 📦 Export to `.mcpack` or `.zip` for instant Minecraft use
 - 🧠 Automatic texture name matching
 - 🔁 Undo/Redo with up to 20 history steps
-- 🔧 Live Edit Mode – test directly in Minecraft’s `resource_packs`
-- 🧩 Split & Merge Projects – for collaboration with Editor/Owner roles
+- 🧩 [Currently disabled due to a bug] Split & Merge Projects – for collaboration with Editor/Owner roles 
 - 🗂️ Bulk folder import support
 - 🎮 Multiple modes: PVP, UI, Survival, New Minecraft
 
