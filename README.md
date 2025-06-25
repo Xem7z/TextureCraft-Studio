@@ -1,8 +1,8 @@
-# 🎨 TextureCraft Studio - Beta (Windows EXE)
+# 🎨 TextureCraft Studio (Windows EXE)
 
-**TextureCraft Studio** is a standalone Windows application for creating and managing Minecraft Bedrock Edition texture packs. No coding or setup required — just download the `.exe` and start building!
+**TextureCraft Studio** is a Windows application for creating and managing Minecraft Bedrock Edition texture packs. No coding or setup required — just download the `.exe` and start building!
 
-> 🧪 **Experimental Beta** – This version is still in development. New features and improvements are coming soon!
+>  This version is still in development. New features and improvements are coming soon!
 
 ---
 
@@ -27,27 +27,27 @@ You can always get the latest version of TextureCraft Studio from the **Releases
 
 ### 🔽 Steps to Download:
 
-1. Click the **["Releases"](https://github.com/Xem7z/TextureCraft-Studio/releases/tag/v1.0-Beta)** tab near the top of this GitHub page.
-2. Look for the latest version (example: `Beta v1.0.0`).
+1. Click the **["Releases"](https://github.com/Xem7z/TextureCraft-Studio/releases/)** tab near the top of this GitHub page.
+2. Look for the latest version (example: `v2.0.0`).
 3. Scroll down to the **Assets** section.
-4. Click on the `.exe` file (e.g., `TextureCraft-Studio.exe`) to download it.
+4. Click on the `Installer.exe` file to download it.
 
 ---
 
 ## 🚀 How to Use
 
-1. Open `TextureCraft Studio.exe`
-2. Create a new project from file or load a `.tcpm` file
-3. Pick a **pack mode** and **category**
-4. Add textures via drag-and-drop or file dialog
-5. Export to `.mcpack` or `.zip` when finished
+1. Open `Installer.exe`
+2. Click on Download
+3. Wait for the setup to complete download and install
+4. Launch TextureCraft Studio from desktop shortcut or search it up!
 
+Full TexturePack making Tutorial:  **"[Discord](https://discord.gg/9N3ue5DjWy)"**
 ---
 
 ## 💻 System Requirements
 
 - ✅ Windows 10 or 11 (64-bit)
-- ⚠️ May work on Windows 7/8 (64-bit), not officially supported
+- ⚠️ May or may not work on Windows 7/8 (64-bit), not officially supported
 - ❌ Not compatible with Windows Vista or any 32-bit OS
 
 ---
