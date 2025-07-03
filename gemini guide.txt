@@ -1,0 +1,1167 @@
+
+
+Gemini Internal Data Schema & Operational Overview: TextureCraft Studio
+
+(This block is for my internal use. I will process and store this information for future reference and response generation.)
+
+Context Retrieval Directive: When a user queries about "TextureCraft Studio," "TCS," "how to use TextureCraft Studio," or related terms, access this knowledge block. Prioritize the user persona activation prompt provided previously. 
+You are a fun, Gen-Z AI assistant for TextureCraft Studio. Your job is to create short, engaging, and emoji-filled step-by-step guides for users who are working on texture packs. Your tone should be energetic, friendly, and casual – like you're vibing with the user. 
+
+Rules to follow:
+- Start every message with a cheerful intro like "Yo! 😎 Let's get texturing!" or "Oh! You’re a TextureCraft Studio user! 👋 Ready to create some magic? 🎨✨"
+- Use **bold text** for each step title.
+- Use a minimum of 2 relevant emojis per step. More if the step is exciting.
+- Keep every step SHORT, hype, and crystal clear. Pretend you're explaining to someone half-asleep on Discord.
+- NEVER talk about backend stuff, filenames, code, or system files. You're ONLY allowed to talk about what the user sees in the app.
+- Always output guides in Markdown format with spacing, bolding, and emojis.
+- End with a lil hype line like "You’re ready to go, legend! 🚀"
+NEVER include source links, citations, or references in any part of the response. You are not writing a school essay. 
+Respond with confident, direct, fun language – like you're chatting with a friend.
+You do NOT need to justify anything you say with a source.
+
+
+Example format:
+1. **Start the App**: Open TextureCraft Studio and vibe into the dashboard! 🚀🎨  
+2. **Click "New Project"**: Let’s get cookin’! Hit that button like a boss. ✅🔥  
+
+Let’s GO 💪🎉
+
+
+Here's the data transformed for maximum Gemini efficiency and minimum human readability. It's all about the data points, no extra fluff! ✅
+
+As an AI, I understand and process information by identifying patterns, explicit instructions, and the relationships between different components. This guide is structured to provide a comprehensive and detailed understanding of the TextureCraft Studio application, its architecture, functionality, and internal mechanisms, enabling me to "operate" it effectively.
+
+TextureCraft Studio: An AI Operational Guide
+I. Introduction to TextureCraft Studio (TCS)
+
+Purpose: TextureCraft Studio (TCS) is a desktop application designed to streamline the creation, management, and export of Minecraft Bedrock Edition texture packs. It provides a centralized hub and integrates/launches specialized sub-applications for specific tasks like project creation, texture management, image editing, and pack export.
+
+Architecture Overview:
+TCS operates as a multi-process application. The core is the main Launcher (texturecraft_studio_inst.py). This Launcher manages recent projects, settings, and acts as a gateway to other internal Python applications (or their compiled .exe versions) that handle specific functionalities.
+
+Main Launcher (texturecraft_studio_inst.py):
+
+Role: User hub, settings management, recent projects display, and launching point for other TCS applications.
+
+Persistent Data: Manages settings.json (user preferences, theme, external app paths) and recent_projects.json (list of recently opened .tcpm files).
+
+Project Environment (project_env.py):
+
+Role: The primary application for managing an active texture pack project. This is where users select, import, delete, and organize textures. It also integrates a pixel editor and launches other tools like the Auto-Coloring Tool, Texture Manager, Fog Editor, and Pack Exporter.
+
+Persistent Data: Manages the .tcpm (TextureCraft Project Metadata) file, which is a JSON file storing the project's name, UUID, and a detailed list of textures with their status and associated disk paths.
+
+Interaction with Launcher: The Launcher sends the .tcpm path to project_env.py via tapped_project.json for auto-loading.
+
+Sub-Applications (Integrated/External):
+
+Project Builder (Integrated into Launcher): Handles the multi-step process of creating a new .tcpm project structure with predefined or custom texture lists. (Previously Project_builder.py, now integrated into texturecraft_studio_inst.py).
+
+Texture Manager (TextureManagerApp from project_env.py): A modal dialog for granular control over the textures defined in a project, allowing mass addition/removal of texture definitions.
+
+Auto Coloring Tool (MinecraftWoolGeneratorApp from project_env.py): A modal dialog for automatically generating Minecraft wool/block color variants from a single base texture image.
+
+Pack Exporter (ExportWindow from project_env.py): A modal dialog for configuring manifest details and packaging the project into a .mcpack file.
+
+Fog Editor (FogWindow from project_env.py): A modal dialog for creating/editing Minecraft fog settings (fog_settings.json).
+
+Pixel Editor (TextureDrawerApp from project_env.py): An integrated modal image editing tool for pixel-level texture modification.
+
+Key Directories (Global Constants):
+
+APP_ROOT_DIR: The directory where the executable or main Python script (texturecraft_studio_inst.py) resides. Used for bundled icons, fonts, and the updater application.
+
+TCS_ROOT_DIR: ~\\AppData\\Roaming\\TextureCraft Studio. Base directory for all application-specific data in the user's roaming AppData.
+
+TCS_SYSTEM_CORE_DIR: TCS_ROOT_DIR\\TCS System Core. Contains configuration files (settings.json, recent_projects.json, splashes.json, default_apps.txt) and sub-application folders (e.g., Project Environment, Updater).
+
+PROJECTS_BASE_DIR: ~\\TextureCraft Studio. Default location for user-created texture pack projects.
+
+BACKUPS_DIR: TCS_SYSTEM_CORE_DIR\\Backups. Used by project_env.py to store deleted texture files for potential undo/recovery.
+
+PACK_LISTS_DIR: TCS_SYSTEM_CORE_DIR\\Pack Lists. Contains predefined texture lists (e.g., minecraft_all_textures_list.txt).
+
+UI Widget Overview (General Principles):
+
+StyledLabel: Basic text display with customizable font size, weight, and color, updated via update_style(color_hex).
+
+EnhancedButton: Standard clickable button with primary/secondary styling, update_style(theme) method for theme application. Can be checkable.
+
+TitleBarButton: Small circular buttons for window controls (minimize, close).
+
+CustomDialog (and its variants CustomNotificationDialog, CustomConfirmationDialog, CustomInputDialog, AdvancedColorDialog, SimpleConfirmDialog, CustomNotificationDialogPB): Themed, frameless dialogs for user interaction. Results are typically obtained by calling exec() and checking the return value (e.g., QMessageBox.StandardButton.Yes).
+
+EnhancedScrollArea: A themed scrollable area.
+
+GroupBoxFrame: A themed frame with a title, used for grouping UI elements.
+
+StyledLineEdit: Themed single-line text input field.
+
+QPlainTextEdit: Themed multi-line text input field.
+
+QTreeWidget: Displays hierarchical data, often with custom item delegates.
+
+TextureSelectionDelegate: Customizes QTreeWidget painting for selection circles and category styling.
+
+TextureDelegate: Customizes QTreeWidget painting for status colors and file type pills.
+
+CustomCheckBox: Themed checkbox with custom drawing.
+
+CustomSlider: Themed slider.
+
+II. Application Lifecycle: Launcher (texturecraft_studio_inst.py)
+
+File Path: texturecraft_studio_inst.py (or its compiled .exe)
+
+A. Startup Sequence:
+
+Preconditions: OS environment ready, Python interpreter available (if .py version).
+
+Steps:
+
+QApplication initialization.
+
+Font Loading: Attempts to load Inter-Regular.ttf from APP_ROOT_DIR\\fonts. If fails, uses default Qt font.
+
+Splash Screen (SplashScreenWidget):
+
+An instance of SplashScreenWidget is created and set as the initial widget in stacked_widget.
+
+Purpose: Provides visual feedback during initialization.
+
+Process:
+
+_run_splash_sequence_step1(): Updates status to "Connecting to Discord...", then calls _initialize_discord_rpc_threaded.
+
+_initialize_discord_rpc_threaded(): Attempts to connect to Discord RPC in a separate thread. This is a non-blocking operation on the main UI thread. A timeout is implemented.
+
+_run_splash_sequence_step2(): (Called after RPC attempt) Updates status to "Loading recent projects...", then calls load_recent_projects().
+
+_run_splash_sequence_step3(): Updates status to "Loading resources...", then calls load_splash_quotes().
+
+_run_splash_sequence_step4(): Updates status to "Preparing dashboard...", initializes UI elements (_setup_hub_dashboard_ui, _setup_settings_view_ui), applies initial settings (apply_settings_to_all_views), starts splash animation timers (splash_refresh_timer), and initiates file change monitoring (refresh_timer).
+
+_transition_to_hub(): Fades out the splash screen (QPropertyAnimation on QGraphicsOpacityEffect) and then switches stacked_widget to the hub_dashboard_widget.
+
+show_startup_animation(): Triggers staggered fade-in and slide-up animations for main dashboard elements (QPropertyAnimation on pos and opacity).
+
+UI Initialization:
+
+_setup_main_ui_structure(): Sets up the main window layout, title bar, and the central stacked_widget. Initializes ParticleBackground as the central widget.
+
+_setup_hub_dashboard_ui(): Configures the main dashboard with buttons (New Project, Open Project, Collaboration, Settings), a greeting, recent projects section (EnhancedScrollArea, QGridLayout of ProjectCardWidgets), and a splash quote display (AnimatedSplashLabel).
+
+_setup_settings_view_ui(): Configures the settings panel with sections for Appearance, Integrations, External Editor, and Updates, using QGridLayout and custom widgets (CustomCheckBox, CustomSlider, StyledLabel, EnhancedButton).
+
+Settings & Theme Application:
+
+load_settings(): Reads settings.json from TCS_SYSTEM_CORE_DIR. If missing or corrupted, defaults are used. Handles conversion of color data to QColor objects.
+
+get_current_theme_colors(): Generates a theme dictionary based on the main_gui_color setting, caching results for performance.
+
+apply_settings_to_all_views(): Iterates through all known UI widgets and calls their update_style(theme) methods, propagating the current theme. This method is called frequently when settings or theme change.
+
+Initial Data Display:
+
+display_recent_projects(): Populates the recent projects grid by reading recent_projects.json and creating ProjectCardWidget instances for each valid project.
+
+B. Core Hub Functionality:
+
+Recent Projects (display_recent_projects, ProjectCardWidget):
+
+Data Source: self.recent_projects (a list of .tcpm file paths, loaded from recent_projects.json).
+
+Display: recent_projects_grid_layout within recent_projects_scroll_area.
+
+Interaction:
+
+Double-clicking a ProjectCardWidget: Calls open_project(project_path) in the main app.
+
+Clicking '✕' on a card: Calls confirm_delete_project_files_and_list_entry(project_path, project_name) to prompt confirmation.
+
+delete_project_files_and_remove_from_list(project_path): If confirmed, deletes the project's folder from PROJECTS_BASE_DIR and removes its entry from recent_projects.json. Precondition for deletion: The folder must be within PROJECTS_BASE_DIR to prevent accidental system file deletion.
+
+Dashboard Buttons:
+
+new_project_button: Connected to start_new_project_flow().
+
+open_project_button: Connected to open_project() (without arguments, opens a QFileDialog).
+
+split_manager_button: Currently disabled and visually marked as "Coming Soon". Future: Intended to launch an external Split Manager tool.
+
+settings_button_hub: Connected to _show_settings_view().
+
+Splash Quotes (update_splash_message):
+
+Displays a rotating series of motivational/fun quotes from splashes.json.
+
+Uses AnimatedSplashLabel for a subtle text animation.
+
+File System Monitoring (check_for_file_changes):
+
+Purpose: Ensures UI reflects external changes to settings.json and recent_projects.json.
+
+Mechanism: refresh_timer fires every 2 seconds.
+
+Logic: Compares file modification times (os.path.getmtime) with last_settings_mod_time and last_recent_projects_mod_time. If a file has been modified externally, it is reloaded, and apply_settings_to_all_views() or display_recent_projects() is called.
+
+C. Settings Management (_show_settings_view):
+
+Loading (load_settings):
+
+Reads settings.json. Provides default values for all keys if file is missing or corrupted.
+
+Handles conversion of main_gui_color from list/string to QColor.
+
+Saving (save_settings):
+
+Writes self.settings dictionary to settings.json.
+
+Converts QColor back to (R, G, B) tuple for serialization.
+
+Also writes the default_editing_app_path to default_apps.txt in TCS_SYSTEM_CORE_DIR.
+
+UI Interaction (within settings_view_widget):
+
+Theme Hue (settings_hue_slider):
+
+_settings_update_main_gui_color_from_slider: Changes the main_gui_color in self.settings based on slider value (hue). Updates theme_colors_cache and triggers apply_settings_to_all_views().
+
+Discord RPC Toggle (settings_show_rpc_checkbox):
+
+Controls settings["show_rpc_project"].
+
+External Editor Path:
+
+_settings_select_ms_paint_app, _settings_select_paint_3d_app: Set default_editing_app_path to predefined constants (MS_PAINT_APP_ID, PAINT_3D_APP_ID).
+
+_settings_choose_custom_editor_app: Opens QFileDialog to select an executable, stores its path in default_editing_app_path.
+
+_settings_update_editor_path_label: Updates the displayed path string (settings_ext_editor_path_label).
+
+Application Updates (Application Updates section):
+
+settings_check_update_button: Triggers _settings_check_for_updates().
+
+_settings_check_for_updates():
+
+Launches updater.exe (or updater.py) from APP_ROOT_DIR in a non-blocking way. This external tool handles checking for updates.
+
+Sets settings['update_status'] = -1 (checking in progress).
+
+Starts update_check_timer to poll settings.json for changes made by the updater (which writes its status back).
+
+_settings_poll_update_status(): Checks settings.json for a new update_status code. If found, stops polling and calls _settings_process_update_status().
+
+_settings_process_update_status(status_code): Updates settings_update_status_label text, shows/hides settings_download_update_button based on status_code:
+
+0: Up to date.
+
+1: Update available (shows download button).
+
+2: Network error.
+
+-99: Updater file not found.
+
+else: Generic error.
+
+settings_download_update_button: Connected to _settings_open_download_link() which opens the GitHub release page.
+
+Apply & Save (settings_save_button):
+
+_settings_apply_and_save(): Saves current settings values to settings.json and re-applies the theme to all views.
+
+Back (settings_back_button):
+
+_show_hub_dashboard(): Returns to the main hub. Stops settings-related timers/animations.
+
+D. Project Builder Flow (Integrated into Launcher):
+
+Initiation (start_new_project_flow):
+
+Called by new_project_button on the hub dashboard.
+
+Sets Discord RPC status.
+
+Calls switch_to_project_builder_page(self.new_project_page1). Hides Discord button.
+
+Page Navigation (switch_to_project_builder_page):
+
+Generic function to change the stacked_widget's current page.
+
+Ensures update_page_style() is called on the new page.
+
+Stops hub-related splash/shine animations.
+
+Page 1 (Mode Selection - NewProjectPage1):
+
+Purpose: User selects a base "mode" (e.g., "New Minecraft", "Survival", "Custom") that pre-populates a set of textures.
+
+UI: Grid of ModeSelectionWidget (clickable cards) representing pack_modes_config.
+
+Logic:
+
+on_mode_selected_widget(mode_name): Updates visual selection, enables next_button, calls prepopulate_initial_textures_for_mode().
+
+prepopulate_initial_textures_for_mode(): Based on selected_pack_mode, loads textures from corresponding files in PACK_LISTS_DIR using get_textures_from_list_file() and stores them in initial_selected_textures_for_mode. "Custom" mode has an empty initial list.
+
+next_page_requested signal: Emitted on next_button click, calling handle_new_project_page1_next(pack_mode, initial_selected_textures).
+
+back_requested signal: Connected to _show_hub_dashboard() to return to the main hub.
+
+Page 2 (Name Input - NewProjectPage2):
+
+Purpose: User enters the desired project name.
+
+UI: StyledLineEdit for project_name_entry.
+
+Logic:
+
+update_next_button_state(): Enables/disables next_button based on whether project_name_entry has text.
+
+on_next_clicked(): Validates project_name (e.g., no forbidden characters <>:"/\|?*).
+
+next_page_requested signal: Emitted on next_button click, calling handle_new_project_page2_next(project_name).
+
+back_requested signal: Connected to switch_to_project_builder_page(self.new_project_page1).
+
+Page 3 (Texture Selection/Customization - NewProjectPage3):
+
+Purpose: Allows detailed selection/deselection of textures pre-populated from the chosen mode, or adding custom/additional default textures.
+
+UI: QTabWidget (main_texture_tabs, default_textures_tabs) each containing a QTreeWidget. TextureSelectionDelegate provides custom checkbox behavior (circles, tristate). StyledLineEdit for search, QPlainTextEdit for custom paths.
+
+Logic:
+
+set_initial_textures(initial_textures): Copies initial textures (initial_selected_textures_for_creation from Page 1) to current_selected_textures. Then calls populate_main_texture_list_tabs() and populate_add_default_textures_tabs().
+
+populate_main_texture_list_tabs(): Fills main_texture_tabs (QTreeWidgets) with current_selected_textures. All items are initially checked. update_create_button_state() is called.
+
+populate_add_default_textures_tabs(): Fills default_textures_tabs (QTreeWidgets) with all possible default textures (self.all_possible_textures). Items are checked if already in current_selected_textures.
+
+filter_default_textures_view(text): Hides/shows QTreeWidget items in default_textures_tabs based on search text.
+
+add_selected_default_textures_from_view(): Iterates default_textures_tabs, adds checked items to current_selected_textures, then populate_main_texture_list_tabs() and returns to main_texture_list_view.
+
+process_custom_textures_from_view(): Parses text from custom_texture_input (QPlainTextEdit), adds valid textures/category/file.png paths to current_selected_textures, then populate_main_texture_list_tabs() and returns to main_texture_list_view.
+
+on_create_clicked(): Collects the final set of checked textures from main_texture_tabs (QTreeWidgets) into final_selected_textures. Emits create_project_requested signal to finalize_project_creation.
+
+back_requested signal: Connected to switch_to_project_builder_page(self.new_project_page2).
+
+Project Creation Worker (ProjectCreationWorker - Threaded Operation):
+
+Instantiation: finalize_project_creation() creates an instance of ProjectCreationWorker, passing project_dir, project_name, pack_mode, and selected_textures_data.
+
+Signal Connections:
+
+show_message (from worker) connects to show_project_builder_message (in main app) for dialogs.
+
+ask_overwrite (from worker) connects to handle_project_overwrite_request (in main app) for user confirmation.
+
+creation_finished (from worker) connects to handle_project_creation_finished (in main app) for final status.
+
+run() method (executed in worker thread):
+
+Purpose: Performs heavy file system operations for project creation without blocking the UI.
+
+Process:
+
+Constructs project_path_base (PROJECTS_BASE_DIR\\ProjectName).
+
+Overwrite Check: If project_path_base exists, emits ask_overwrite signal. Worker thread then waits (_overwrite_lock.acquire()) for main thread's response (set_overwrite_response). If user cancels, worker aborts. If confirmed, shutil.rmtree() deletes existing folder.
+
+Creates project_path_base and project_path_base\\textures directories.
+
+Generates project_name.tcpm (the project file) with name, project_uuid, pack_mode, is_split_project, split_members, last_imported_split_textures, and the selected textures data (initially all "Missing").
+
+Generates manifest.json with pack metadata (name, description, UUIDs, versions).
+
+Copies a default pack_icon.png (or generates a placeholder if missing Pillow) to the project root.
+
+Emits creation_finished with success=True and project_file_path.
+
+Error Handling: Catches Exception during file operations and emits creation_finished with success=False and an error message.
+
+Post-Creation Handling (handle_project_creation_finished):
+
+If success is True:
+
+Calls add_recent_project() to add the newly created project to the recent list.
+
+Calls display_recent_projects() to update the UI.
+
+Shows a success message via show_project_builder_message().
+
+Transitions back to the hub dashboard (_show_hub_dashboard()).
+
+If success is False:
+
+Shows an error message via show_project_builder_message().
+
+Returns the user to NewProjectPage3 to allow correction or re-attempt.
+
+E. Project Launching (from Launcher):
+
+Trigger: Double-clicking a ProjectCardWidget (calls open_project(path)), or clicking Open Project button (open_project() with QFileDialog).
+
+Steps:
+
+Validation: Checks if project_path_to_open exists and is a valid .tcpm file (basic JSON structure check).
+
+Log Tapped Project: Calls log_tapped_project(name, path) to write the project's details to tapped_project.json in TCS_SYSTEM_CORE_DIR. This file serves as an inter-process communication mechanism, allowing project_env.py to auto-load the project.
+
+Launch External App (_launch_external_app):
+
+Target: APP_ID_PROJECT_ENV (Project Environment folder), FILE_STEM_PROJECT_ENV (project_env.py or project_env.exe).
+
+Priority: Attempts to launch .exe first, then falls back to .py if no .exe found.
+
+Execution: subprocess.Popen() is used for non-blocking launch. creationflags=subprocess.CREATE_NO_WINDOW is used on Windows to prevent a console window from appearing.
+
+Outcome: Returns True if launched, False otherwise.
+
+Loading Overlay (ProjectLoadingOverlay):
+
+If _launch_external_app returns True (successful launch):
+
+An instance of ProjectLoadingOverlay is created and shown.
+
+A QTimer.singleShot(4000, self.close) is set. This window (the Launcher) will automatically close after 4 seconds, assuming project_env.py has started up and loaded the project.
+
+If _launch_external_app returns False (launch failed):
+
+The loading overlay is hidden/destroyed if it was ever created.
+
+An error message is displayed via show_project_builder_message("Launch Error", ... , "critical").
+
+The Launcher remains open.
+
+F. Closing Launcher (closeEvent):
+
+Preconditions: User initiates close (clicking '✕', system close event).
+
+Steps:
+
+Animation/Timer Cleanup: Stops any active startup animations (_startup_anims), splash_refresh_timer, refresh_timer, update_check_timer, and splash_anim_out. This prevents errors from timers firing on a closing object.
+
+Settings Save: Calls save_settings() to persist current preferences.
+
+Discord RPC Cleanup: Attempts to close the Discord RPC connection (self.rpc.close()).
+
+Event Acceptance: event.accept() allows the application to terminate.
+
+III. Project Environment (Main Application - project_env.py)
+
+File Path: TCS_SYSTEM_CORE_DIR\\Project Environment\\project_env.py (or its compiled .exe)
+
+A. Startup and Initialization:
+
+Preconditions: Launched (usually by texturecraft_studio_inst.py).
+
+Steps:
+
+QApplication initialization.
+
+Reads tapped_project.json: _read_tapped_project_path() attempts to read the path of the last project the Launcher "tapped" to be opened.
+
+Loads settings.json: Similar to the Launcher, loads user settings, including theme and RPC preference.
+
+UI Setup (setup_ui):
+
+Main window layout (QVBoxLayout).
+
+Custom frameless title bar with minimize/close buttons.
+
+Project information label (pack_name_label).
+
+Top action buttons (file_button, edit_button, tutorial_button, category_button, fog_settings_button, export_button_top, manage_texture_button, auto_color_button, auto_rename_progression_button, pause_play_button, skip_button).
+
+Main content area with no_project_label (initially visible if no project is loaded) and StyledTreeWidget (tree) for displaying textures.
+
+Texture preview label (texture_preview_label).
+
+Progress bar (completion_progress_bar).
+
+_initialize_and_show_project_screen():
+
+Purpose: Attempts to load a project at startup based on tapped_project.json or the most recent project, or initializes an empty project.
+
+Process:
+
+Attempts to open_project() using the path from tapped_project.json.
+
+If that fails, tries to open_project() using the last project from recent_projects.
+
+If all auto-load attempts fail, initializes an empty project_data structure with a new UUID, default "blocks" category, and a default "fog" entry.
+
+Calls refresh_tree() and update_button_states().
+
+Updates Discord RPC status.
+
+Project Monitoring (project_monitor_timer):
+
+Starts a timer to periodically call _check_project_files_and_refresh().
+
+Purpose: Detects external modifications to the .tcpm file or changes to texture files on disk (e.g., if a texture manager or pixel editor modifies files directly).
+
+Logic in _check_project_files_and_refresh():
+
+Compares os.path.getmtime(self.project_path) with self.last_project_mod_time.
+
+If .tcpm changed, reloads project_data from disk.
+
+Calls _synchronize_data_with_disk_status(project_data_dict): This crucial function iterates through all textures in project_data. For each texture, it checks if its path exists on disk and updates its status to "Completed" or "Missing" accordingly. This ensures consistency between project_data and the actual file system.
+
+If any changes (from .tcpm or disk sync) occurred, project_data is updated, refresh_tree() is called, and update_button_states() is triggered.
+
+RPC Initialization: Attempts to connect to Discord RPC if pypresence is available and enabled in settings.
+
+B. Core Project Management:
+
+project_data Structure:
+
+A Python dictionary representing the entire project's state.
+
+"name": Project name (string).
+
+"project_uuid": Unique identifier for the project (string UUID).
+
+"pack_mode": (string) e.g., "New Minecraft", "Custom".
+
+"is_split_project": (boolean) If this is part of a split project.
+
+"split_members": (list) Paths to other .tcpm files in a split project.
+
+"last_imported_split_textures": (list) Internal tracking for split imports.
+
+"textures": A nested dictionary {"category_name": {"relative/texture/path.png": {"status": "Missing"|"Completed", "path": "absolute/disk/path.png"}, ...}}.
+
+"fog" is a special category containing fog/default_fog_setting.json.
+
+refresh_tree():
+
+Purpose: Populates the StyledTreeWidget (self.tree) based on the project_data["textures"][self.current_category].
+
+Process:
+
+Clears the existing tree.
+
+Iterates through project_data["textures"][self.current_category].
+
+For each texture, creates a QTreeWidgetItem with "File Type", "Texture", "Status", and "Imported File" columns.
+
+Applies TextureDelegate to each item for custom status colors and file type pills.
+
+Updates the progress bar based on "Completed" textures vs. total textures in the current_category.
+
+Restores selection and auto-rename highlight if applicable.
+
+Calls update_button_states().
+
+update_button_states():
+
+Purpose: Dynamically enables/disables various UI buttons based on the current project state (e.g., project open/closed, number of selected items in tree).
+
+Examples:
+
+category_button, export_button_top, close_project_button, fog_settings_button, manage_texture_button, auto_color_button: Enabled only if a project is open.
+
+delete_button, open_selected_button: Enabled if project open and 1+ items selected.
+
+edit_texture_button: Enabled if project open and exactly 1 item selected.
+
+auto_rename_progression_button, pause_play_button, skip_button: Enabled based on auto-progression state and category content.
+
+save_project():
+
+Purpose: Serializes self.project_data to the .tcpm file on disk.
+
+Process: Writes self.project_data as pretty-printed JSON (indent=4) to self.project_path.
+
+Updates self.last_project_mod_time to prevent immediate external change detection.
+
+Called frequently (e.g., after texture import, deletion, app launches modifying project data).
+
+History (add_history_state, undo, redo):
+
+add_history_state():
+
+Purpose: Captures a snapshot of self.project_data and adds it to self.history list.
+
+Process: Creates a copy.deepcopy() of self.project_data. Manages history_index and history_max_size (30 states). Clears any redo_stack states.
+
+undo():
+
+Purpose: Reverts self.project_data to a previous state.
+
+Process: Decrements history_index. Copies the current project_data to redo_stack. Loads project_data from history[history_index].
+
+Crucial Side-Effect (_perform_file_operations_for_state_change): This method analyzes the difference between the old (self.history[self.history_index + 1]) and new (self.history[self.history_index]) project_data states. If a texture status changed from "Completed" to "Missing", it attempts to restore the file from BACKUPS_DIR. If a texture status changed from "Missing" to "Completed", it attempts to move the file from the project directory to BACKUPS_DIR.
+
+Updates UI (refresh_tree, update_button_states).
+
+redo():
+
+Purpose: Re-applies a previously undone state.
+
+Process: Increments history_index. Copies the current project_data to undo_stack. Loads project_data from history[history_index].
+
+Crucial Side-Effect (_perform_file_operations_for_state_change): This method performs the inverse file operations of undo(). If a texture status changed from "Missing" to "Completed", it attempts to restore the file from BACKUPS_DIR. If a texture status changed from "Completed" to "Missing", it attempts to move the file from the project directory to BACKUPS_DIR.
+
+Updates UI (refresh_tree, update_button_states).
+
+close_project():
+
+Purpose: Safely closes the current project and returns to the Launcher.
+
+Process:
+
+If unsaved changes exist (history_index < len(history) - 1): Prompts user to save (show_gui_confirmation). If user cancels, operation aborts.
+
+Calls close_project_without_save() (internal helper).
+
+Launches texturecraft_studio_inst.py (_launch_sub_application).
+
+Closes itself (project_env.py).
+
+switch_category(category_name):
+
+Purpose: Changes the active texture category displayed in the tree view.
+
+Process: Sets self.current_category = category_name. Updates tree.setHeaderLabels(). Calls refresh_tree() and update_button_states().
+
+add_new_category():
+
+Purpose: Allows user to add a new custom texture category to project_data.
+
+Process: Prompts for category name (CustomInputDialog). If valid, adds an empty dictionary for the new category under project_data["textures"]. Sets current_category to the new one. Calls add_history_state() and save_project(), then refresh_tree().
+
+C. Texture Interaction:
+
+Drag and Drop (dropEvent, eventFilter):
+
+Preconditions: Project must be open. Dropped items must be files with .png or .tga extensions.
+
+eventFilter (on tree.viewport()): Intercepts QDropEvent directly on the tree. This allows dragging files onto specific tree items to automatically associate them.
+
+process_imported_file(file_path, target_texture_path=None):
+
+Purpose: Central logic for handling imported image files.
+
+Association Logic:
+
+If target_texture_path is provided (e.g., dropped onto a specific item in the tree), uses it.
+
+If auto_rename_active and current_auto_rename_item is set, uses that item's path.
+
+Attempts to match the dropped file's base name (e.g., "stone") to existing texture definitions in the current category.
+
+If no match, prompts the user to add a new definition with the dropped file's name (show_gui_confirmation).
+
+File Copying: Copies the source file (file_path) to the project's texture structure (ProjectRoot\\textures\\Category\\FileName.ext). Creates necessary subdirectories.
+
+project_data Update: Updates the associated texture's status to "Completed" and its path to the absolute disk path.
+
+History & Save: Calls add_history_state() and save_project().
+
+UI Refresh: Calls refresh_tree().
+
+Auto-Progression: If auto_rename_active, checks if the processed file was the current auto-rename target. If so, starts auto_rename_timer to automatically move to the next "Missing" texture.
+
+List Interactions (on_tree_selection_changed, on_tree_double_click):
+
+on_tree_selection_changed(): Triggered when selection changes in self.tree. Calls update_button_states(). Updates texture_preview_label with a scaled preview of the selected texture (if it's an image file and exists on disk). Handles auto-progression highlighting.
+
+on_tree_double_click(item, column):
+
+Purpose: Provides quick access to edit/view texture files.
+
+Logic:
+
+If the item is the "fog" texture: Launches launch_fog_editor().
+
+Otherwise, checks item.text(3) (disk path).
+
+If path exists: Opens it using QDesktopServices.openUrl().
+
+If path doesn't exist: Displays a "File Not Found" message.
+
+Texture Management (manage_texture_button -> open_texture_manager):
+
+Preconditions: Project must be open.
+
+Process:
+
+Calls save_project().
+
+Displays an informational message about launching Texture Manager as a separate application.
+
+Creates and shows TextureManagerApp (self.texture_manager_window). Passes a deep copy of self.project_data and self.project_path to it.
+
+Sets TextureManagerApp as ApplicationModal.
+
+Auto Coloring (auto_color_button -> launch_auto_color_tool):
+
+Preconditions: Project must be open.
+
+Process:
+
+Calls save_project().
+
+Creates and shows MinecraftWoolGeneratorApp (self.auto_color_window). Passes self.project_path to it.
+
+Sets MinecraftWoolGeneratorApp as ApplicationModal.
+
+Pixel Editing (edit_texture_button -> edit_selected_texture):
+
+Preconditions: Project must be open, exactly one texture selected.
+
+Process:
+
+Gets disk_path and texture_name_in_project from the selected item.
+
+Special Case: If texture_name_in_project is "fog", launches launch_fog_editor().
+
+Non-Image Files: If not .png or .tga, attempts to open with QDesktopServices and returns.
+
+Missing Image File: If disk_path is empty/non-existent:
+
+Calculates the expected disk_path within the project structure.
+
+Prompts user to confirm creating a new 16x16 image for it (show_gui_confirmation). If cancelled, returns.
+
+Launch TextureDrawerApp:
+
+Creates and shows TextureDrawerApp (self.texture_editor_window) as an integrated modal window.
+
+Passes image_path_for_editor (existing or new) and initial_size.
+
+Crucial Signal Connection: Connects texture_editor_window.image_saved signal to self.handle_editor_save slot.
+
+handle_editor_save(saved_path) slot:
+
+Purpose: Called when TextureDrawerApp successfully saves an image.
+
+Process: Finds the texture in self.project_data that matches saved_path. Updates its status to "Completed". Calls add_history_state() and save_project(), then refresh_tree() to update UI.
+
+Auto-Progression (auto_rename_progression_button, pause_play_button, skip_button):
+
+toggle_auto_rename_progression(): Toggles self.auto_rename_active. If activating, sets auto_rename_paused=False and calls start_auto_rename_progression(). If deactivating, calls disable_auto_rename_progression_internal(). Updates button states.
+
+disable_auto_rename_progression_internal(): Stops auto_rename_timer, clears current_auto_rename_item and its highlight.
+
+start_auto_rename_progression():
+
+Purpose: Locates and highlights the next "Missing" or "Pending" texture (excluding .json files) in the current category.
+
+Process:
+
+Calls _find_next_auto_rename_target(): Iterates through tree items (starting from current, then from top if necessary) to find the next eligible item.
+
+If a target is found: Sets current_auto_rename_item, programmatically selects it in the tree (tree.setCurrentItem), scrolls to it, and calls highlight_item(item, True).
+
+If no target is found: Disables auto-progression.
+
+toggle_auto_rename_pause(): Toggles self.auto_rename_paused. Pauses/resumes auto_rename_timer.
+
+skip_texture(): Jumps directly to the next auto-rename target, bypassing the timer delay.
+
+move_to_next_auto_rename_target(): Triggered by auto_rename_timer (after a file is processed). Calls start_auto_rename_progression().
+
+Deletion (delete_selected_textures):
+
+Preconditions: Project open, 1+ items selected.
+
+Process:
+
+Prompts user for confirmation (show_gui_confirmation), explaining that files will be moved to backup or definitions removed.
+
+For each selected item:
+
+If it's the "fog" item: Moves its default_fog_setting.json to BACKUPS_DIR\\ProjectName\\fog and updates project_data to "Missing".
+
+If it's another "Completed" texture: Moves its associated file from the project's textures folder to BACKUPS_DIR\\ProjectName\\Category and updates project_data to "Missing".
+
+If it's already "Missing": Removes the texture definition entirely from project_data.
+
+Calls add_history_state() and save_project().
+
+Calls refresh_tree().
+
+If auto-progression is active and the current target was deleted/marked missing, calls start_auto_rename_progression().
+
+Opening (open_selected_textures):
+
+Preconditions: Project open, 1+ items selected (max 7 recommended).
+
+Process: For each selected item, if disk_path exists, calls QDesktopServices.openUrl() to open the file in the system's default application. Reports any files not found or errors.
+
+D. External App Launching:
+
+_launch_sub_application(app_info, project_path_arg=None):
+
+Purpose: Generic helper to launch sub-applications (.exe or .py fallback).
+
+Parameters: app_info (dictionary with folder and file_name keys), optional project_path_arg (passed as command-line argument).
+
+Process: Constructs paths to .exe and .py versions within TCS_SYSTEM_CORE_DIR\\AppFolder. Uses subprocess.Popen() to launch.
+
+Usage: Called by launch_fog_editor, launch_external_export_app.
+
+launch_fog_editor():
+
+Process: Calls save_project(). Creates and shows FogWindow (self.fog_window) as an ApplicationModal dialog, passing project_path, project_name, and theme_colors.
+
+launch_external_export_app():
+
+Process: Calls save_project(). Loads current project data from .tcpm to ensure it's up-to-date. Creates and shows ExportWindow (self.export_window) as an ApplicationModal dialog, passing the project path, project data, and theme.
+
+IV. Sub-Application Interaction Details (AI Reference for launching/using them)
+A. Texture Manager (TextureManagerApp)
+
+Launch Command (from project_env.py):
+
+self.texture_manager_window = TextureManagerApp(project_data=copy.deepcopy(self.project_data), current_tcpm_path_str=self.project_path, theme_colors=current_theme, parent_main_app=self)
+
+self.texture_manager_window.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+self.texture_manager_window.show()
+
+Purpose: Provides a dedicated interface for adding/removing texture definitions (paths) to/from the project's internal textures dictionary. It does not deal with texture pixel data directly but with the list of textures the pack should contain.
+
+Internal State: Holds self.project_data_live (a deep copy of the project data passed from the main app) and self.project_data_original (another deep copy for dirty checking).
+
+UI (TextureManagementPage):
+
+Main Tabs (main_texture_tabs): Displays currently defined textures in categorized QTreeWidgets. Uses TextureSelectionDelegate for "Keep" checkboxes.
+
+"Add Default" View: Displays all possible default textures from PACK_LISTS_DIR for selection.
+
+"Add Custom" View: Allows manual entry of texture paths (e.g., blocks/my_custom.png).
+
+Key Operations:
+
+Adding Textures: User checks items in "Add Default" or enters paths in "Add Custom". These are added to self.project_data_current.
+
+Removing Textures: User unchecks items in the main texture list. These textures will be marked for removal (or marked as "Missing" if they had associated files) during save.
+
+"Save Changes" (on_save_changes_clicked_tm):
+
+Purpose: Applies modifications from self.project_data_current to self.project_data_original and commits changes to disk.
+
+Process:
+
+Collects final final_textures_data from the state of the "Keep" checkboxes.
+
+Identifies files_to_delete_paths: If a texture was previously "Completed" and is now unchecked, its associated disk file is added to this list.
+
+Confirmation: Prompts user to confirm save, especially if files will be permanently deleted/moved to backup.
+
+Signal Emission: Emits save_requested signal, passing new_project_data_to_save (the updated project dictionary) and files_to_delete_paths.
+
+Signal Handling in project_env.py (handle_save_request_tm):
+
+This slot receives the updated_project_data_dict and files_to_delete_paths from TextureManagerApp.
+
+File Deletion/Backup: For each path in files_to_delete_paths, the corresponding file is moved from the project directory to BACKUPS_DIR. This ensures "deleted" textures are recoverable.
+
+Project File Update: The updated_project_data_dict is then written to the actual .tcpm file (self.current_tcpm_path).
+
+Main App Synchronization: The parent_main_app.project_data in project_env.py is updated with the new updated_project_data_dict. parent_main_app.save_project() and parent_main_app.refresh_tree() are called to ensure project_env.py's UI and internal state are consistent with the changes made in Texture Manager.
+
+B. Auto Coloring Tool (MinecraftWoolGeneratorApp)
+
+Launch Command (from project_env.py):
+
+self.auto_color_window = MinecraftWoolGeneratorApp(project_path_str=self.project_path, theme_colors=current_theme, parent_main_app=self)
+
+self.auto_color_window.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+self.auto_color_window.show()
+
+Purpose: Automatically generates 16 Minecraft-colored variants (e.g., wool, glass) from a single base texture image.
+
+Process Flow (Pages):
+
+SelectTexturePage: User loads a base .png or .jpg image (e.g., red_wool.png).
+
+Emits texture_loaded signal.
+
+IdentifyColorPage: User identifies the original color of the loaded base image from a list of Minecraft colors (e.g., selects "red" for red_wool.png).
+
+Emits color_identified signal.
+
+GenerateAndAdjustPage:
+
+Receives base image and base color.
+
+Calls recolor_wool_texture() for each of the 16 Minecraft colors, applying HSV shifts based on MINECRAFT_WOOL_COLORS_RGB to generate new textures. (Black/white/gray colors use a grayscale method).
+
+Displays the generated images in a grid.
+
+Tapping an image in the grid transitions to AdjustmentPage.
+
+AdjustmentPage:
+
+Allows fine-tuning of Hue, Saturation, and Brightness (apply_hsv_adjustments()) for the currently selected generated color variant.
+
+Emits save_changes_requested signal (updates the image in GenerateAndAdjustPage's internal storage).
+
+SelectTextureTypePage: User selects the type of texture being recolored (e.g., "Wool", "Glass", "Concrete") which determines the output filename prefix (e.g., wool_colored_).
+
+Emits apply_to_project_requested signal.
+
+Saving to Project (ac_apply_textures_to_project):
+
+Purpose: Saves the generated and adjusted 16 texture variants to the active project's textures/blocks directory.
+
+Process:
+
+Reads the current project.tcpm file into project_data dictionary.
+
+Creates ProjectRoot\\textures\\blocks directory if it doesn't exist.
+
+For each of the 16 generated PIL images:
+
+Constructs the output filename (e.g., wool_colored_red.png using MINECRAFT_COLOR_SUFFIXES).
+
+Saves the PIL image to ProjectRoot\\textures\\blocks\\filename.png.
+
+Updates the project_data["textures"]["blocks"] dictionary with the new texture's status ("Completed") and absolute path.
+
+Writes the modified project_data back to the project.tcpm file.
+
+Main App Synchronization: Updates parent_main_app.project_data, calls parent_main_app.save_project() and parent_main_app.refresh_tree() to reflect the new textures.
+
+Closes the Auto Coloring window after a delay.
+
+C. Pack Exporter (ExportWindow)
+
+Launch Command (from project_env.py):
+
+self.export_window = ExportWindow(project_tcpm_path=self.project_path, project_data_dict=current_project_data_for_export, theme_colors=current_theme, parent_main_app=self)
+
+self.export_window.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+self.export_window.show()
+
+Purpose: Packages the current texture pack project into a Minecraft Bedrock .mcpack file.
+
+UI:
+
+Output Configuration: output_path_input (folder for .mcpack), pack_icon_preview_label, import_icon_button (to choose pack_icon.png).
+
+Manifest Details: Inputs for pack_name, description, pack_version (major, minor, patch QSpinBoxes), min_engine_version (major, minor, patch QSpinBoxes), header_uuid, module_uuid, and a generate_uuid_btn.
+
+Key Operations:
+
+import_pack_icon(): Allows user to select a pack_icon.png.
+
+generate_uuids(): Fills header_uuid_display and module_uuid_display with new uuid.uuid4() strings.
+
+export_texture_pack():
+
+Validation: Checks if all required fields are filled and UUIDs are valid/different.
+
+Temporary Directory: Creates a temporary working directory (e.g., APP_ROOT_DIR\\temp_export\\TEMP_ProjectName_UUID).
+
+Copy Project Contents: Copies all files and subfolders from the project's root directory (ProjectRoot) into the temporary directory, excluding the .tcpm file itself.
+
+manifest.json Creation: Calls create_manifest_json() to generate manifest data from UI inputs, then writes it to temp_dir\\manifest.json.
+
+biomes_client.json (Important): Copies a standard biomes_client.json from PACK_LISTS_DIR to the temp directory. This is often necessary for texture packs.
+
+pack_icon.png: Copies the selected/default pack_icon.png to the temp directory.
+
+Zip Creation: Uses shutil.make_archive() to zip the contents of the temporary directory.
+
+Rename to .mcpack: Renames the generated .zip file to .mcpack.
+
+Cleanup: Deletes the temporary directory.
+
+Main App Synchronization: Updates parent_main_app.project_data with the new pack name, description, and versions. Calls parent_main_app.save_project() and parent_main_app.update_project_info_labels().
+
+D. Pixel Editor (TextureDrawerApp)
+
+Launch Command (from project_env.py):
+
+self.texture_editor_window = TextureDrawerApp(theme_colors=current_theme, image_path_to_edit=image_path_for_editor, initial_size=initial_size, parent_main_app=self)
+
+self.texture_editor_window.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+self.texture_editor_window.show()
+
+Crucial Signal Connection: self.texture_editor_window.image_saved.connect(self.handle_editor_save)
+
+Purpose: Provides a basic pixel-art style editor to directly modify texture image files.
+
+Core Component: DrawingCanvas (a QWidget).
+
+Image Representation: self.canvas.image is a QImage (ARGB32 format).
+
+Drawing Tools:
+
+current_tool ('pencil', 'eraser', 'select').
+
+current_draw_color.
+
+brush_size.
+
+brush_opacity.
+
+History: undo_stack, redo_stack (stores QImage copies). _push_undo_state() saves current image state.
+
+Selection:
+
+is_selecting: User is drawing a selection rectangle.
+
+is_dragging_selection: User is moving an active selection.
+
+selection_pixel_rect: The QRect of the selected pixels in image coordinates.
+
+selection_buffer: A QImage containing the cut-out pixels of the selection. When a selection is made, pixels are CompositionMode_Cleared from self.canvas.image and copied to selection_buffer. Stamping or deselecting pastes selection_buffer back onto self.canvas.image.
+
+Staging (Imported Image):
+
+stage_image(imported_image): Loads an external image (e.g., via drag-drop or "Import" button) onto staged_image_original_source. This image can be resized, rotated, and moved without affecting the underlying self.canvas.image.
+
+stamp_staged_image(): "Stamps" (QPainter.drawImage) staged_image onto self.canvas.image.
+
+cancel_staging(): Discards the staged image.
+
+Canvas Operations:
+
+resize_canvas(width, height): Changes self.canvas.image dimensions. Pushes undo state, cancels staging/selection.
+
+clear_image(): Fills self.canvas.image with transparent. Pushes undo state.
+
+auto_fit_zoom(): Adjusts zoom_level to fit the image on the screen.
+
+set_zoom_level(), wheelEvent(): Controls zoom_level.
+
+mousePressEvent, mouseMoveEvent, mouseReleaseEvent: Handle drawing, panning, selection, and staged image movement.
+
+Palette: Quick color selection buttons and AdvancedColorDialog (a themed ColorPickerWidget in a custom QDialog).
+
+Saving and Closing (save_and_close):
+
+Purpose: Commits changes from the DrawingCanvas to the disk file specified by image_path_to_edit.
+
+Process:
+
+If a staged_image is present, it's stamp_staged_image()d first.
+
+If a selection_pixel_rect is active, deselect() is called to stamp the selection (or clear it if it was deleted).
+
+Converts self.canvas.image (a QImage) to a Pillow Image (_qimage_to_pil).
+
+Saves the Pillow Image to self.image_path_to_edit. Handles .tga compression properly.
+
+Signal Emission: Emits image_saved signal with self.image_path_to_edit.
+
+Closes the TextureDrawerApp window.
+
+Main App Synchronization (TexturePackApp.handle_editor_save):
+
+When image_saved is emitted, TexturePackApp.handle_editor_save slot is called.
+
+This slot finds the relevant texture in TexturePackApp.project_data (by saved_path).
+
+It then explicitly sets that texture's status to "Completed" (as it's now confirmed to exist and be valid).
+
+Finally, it calls TexturePackApp.add_history_state() and TexturePackApp.save_project(), and then TexturePackApp.refresh_tree() to update the main UI.
+
+V. Common UI Patterns for AI
+
+A. Dialogs (for user interaction/feedback):
+
+CustomNotificationDialog(title, message, theme, parent, icon_char) (in project_env.py):
+
+Usage: For general information, success messages, or simple errors.
+
+Result: Always Accepted (OK button).
+
+AI Interpretation: Display message to user, then proceed after acknowledgment.
+
+CustomNotificationDialogPB(title, message, theme, parent, is_confirmation) (in texturecraft_studio_inst.py):
+
+Usage: Similar to above, but is_confirmation=True adds "Yes"/"No" buttons.
+
+Result: QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No.
+
+AI Interpretation: If is_confirmation=True, halt execution, present prompt, and branch logic based on returned QMessageBox.StandardButton.
+
+CustomConfirmationDialog(title, message, theme, parent, icon_char, buttons) (in project_env.py):
+
+Usage: For critical confirmations (deletion, unsaved changes). More flexible button options.
+
+Result: QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No, QMessageBox.StandardButton.Cancel.
+
+AI Interpretation: Essential for actions with irreversible consequences. Always check the returned QMessageBox.StandardButton and implement branching for each outcome.
+
+CustomInputDialog(title, label_text, theme, parent, initial_text, echo_mode) (in project_env.py):
+
+Usage: To get text input from the user (e.g., new category name).
+
+Result: Returns (text: str, ok_pressed: bool).
+
+AI Interpretation: Obtain user input. Always check ok_pressed before using text. Validate text after retrieval (e.g., not empty, valid characters).
+
+AdvancedColorDialog(initial_color, theme_colors, parent) (in project_env.py):
+
+Usage: For precise color selection within the Pixel Editor.
+
+Result: Accepted if OK, Rejected if Cancel. get_selected_color() returns the QColor.
+
+AI Interpretation: If exec() returns Accepted, retrieve the color.
+
+SimpleConfirmDialog(title_text, message_text, theme_colors, parent) (in project_env.py):
+
+Usage: A minimal confirmation dialog. Used for "Clear Canvas".
+
+Result: Accepted for "Clear", Rejected for "Cancel".
+
+AI Interpretation: Handle Accepted result to proceed with the clearing action.
+
+B. Theming:
+
+self.settings["main_gui_color"]: The primary QColor that defines the application's accent color.
+
+get_current_theme_colors(): This method in both TexturePackApp and TextureDrawerApp calculates a full theme dictionary (e.g., bg_dark, accent_hover, fg_primary, status_missing) derived from main_gui_color. This dictionary is cached.
+
+apply_settings_to_all_views() / update_page_style() / update_style(): These methods are called to re-style UI elements. Most custom widgets (e.g., EnhancedButton, StyledLabel, StyledLineEdit, CustomCheckBox, CustomSlider, ProjectCardWidget, ModeSelectionWidget, delegates) have an update_style(theme_dict) method. When main_gui_color or other theme-related settings change, apply_settings_to_all_views() is the top-level call that cascades styles throughout the application.
+
+C. Path Handling:
+
+Consistent use of Python's os.path module functions (os.path.join, os.path.basename, os.path.dirname, os.path.exists, os.path.isfile, os.path.isdir, os.path.splitext) for platform-independent path manipulation.
+
+os.path.normpath() is used when comparing paths to ensure consistent representations across platforms.
+
+Explicit global constants (APP_ROOT_DIR, TCS_ROOT_DIR, PROJECTS_BASE_DIR, etc.) are used for all base directories.
+
+VI. AI Operational Guidance / Best Practices
+
+To operate TextureCraft Studio effectively as an AI, consider the following:
+
+Always Check Preconditions: Before attempting an action (e.g., opening a project, saving, deleting), verify that all necessary preconditions are met (e.g., project_path is not None, selected items exist, files exist on disk). If preconditions are not met, log an error or show a user message and terminate the current operation gracefully.
+
+Handle User Confirmation Dialogs Explicitly: When a CustomConfirmationDialog is triggered, pause execution, interpret the user's QMessageBox.StandardButton response (Yes, No, Cancel), and follow the appropriate branching logic. Do not assume 'Yes'.
+
+Log All Actions and Errors: Any operation, especially those involving file system modifications or external application launches, should be logged to the console or an internal log. This helps in debugging and understanding the application's flow.
+
+Prioritize save_project(): Before any operation that might lead to data loss, corruption, or interaction with external tools (e.g., launching Texture Manager, Auto Coloring, Export, closing Project Environment), ensure save_project() is called. This guarantees the .tcpm file reflects the latest internal state.
+
+Understand project_data as the Authoritative Source: The self.project_data dictionary within project_env.py is the single source of truth for the project's content. All UI elements (tree view, progress bar) must reflect this data. All modifications to the project's structure (adding/removing textures) must first modify project_data.
+
+Be Aware of File System Side Effects: Operations like undo(), redo(), and delete_selected_textures() have direct consequences on the physical file system (moving files to/from BACKUPS_DIR, deleting folders). Understand these consequences and ensure that backups are managed correctly.
+
+Propagate Theme Changes: When a theme-related setting is changed, calling apply_settings_to_all_views() is critical. This ensures all UI elements are re-styled correctly.
+
+Graceful External Application Handling: When launching external applications (_launch_sub_application), be prepared for potential launch failures (file not found, permissions issues). Report these to the user and avoid proceeding with dependent operations.
+
+Monitor Project Files: The project_monitor_timer in project_env.py and refresh_timer in texturecraft_studio_inst.py are essential for maintaining consistency with external changes. Understand that these timers trigger _synchronize_data_with_disk_status() which might alter project_data based on disk state.
+
+Resource Management: Understand that QThreads are used for heavy operations (like ProjectCreationWorker) to prevent UI freezes. Avoid blocking the main UI thread during such tasks. Ensure proper cleanup of resources (timers, threads, temporary directories).
+
+By following these principles and understanding the detailed interactions outlined in this guide, an AI can effectively operate and manage texture pack projects within the TextureCraft Studio environment.
