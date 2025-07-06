@@ -26,10 +26,7 @@ You can always get the latest version of TextureCraft Studio from the **Releases
 
 ### 🔽 Steps to Download:
 
-1. Click the **["Releases"](https://github.com/Xem7z/TextureCraft-Studio/releases/)** tab near the top of this GitHub page.
-2. Look for the latest version (example: `v2.0.0`).
-3. Scroll down to the **Assets** section.
-4. Click on the `Installer.exe` file to download it.
+1. "[Click here](https://github.com/Xem7z/TextureCraft-Studio/releases/download/v2.0.0/Installer.exe)" to download the Installer.
 
 ---
 
@@ -58,6 +55,10 @@ C:\Users\YourName\TextureCraft Studio\
 
 ---
 
+## ❓Frequently Asked Questions
+Click to see all [FAQs](https://discord.gg/2rqK9rXPYq)!
+
+---
 ## 📣 Join the Community
 
 Got questions, bugs or suggestions?  
