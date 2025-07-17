@@ -68,6 +68,10 @@ Join the official TextureCraft Studio Discord:
 
 ---
 
+## 💿 Data Sharing and User Experience
+> We do not collect any user data from this application, such as API tokens, and never share any such information with third parties. 
+> We store all user data on your personal computer storage. If you have any questions, suggestions, or issues with the application, please report them in my Discord server.
+
 ## ❗ License & Permissions
 
 > ❌ **Do NOT** redistribute, decompile, edit, or reupload TextureCraft Studio.  
